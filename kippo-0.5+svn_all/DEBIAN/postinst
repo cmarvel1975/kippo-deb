@@ -4,8 +4,10 @@ set -e
 case "$1" in
   "configure"|"reconfigure"|"upgrade")
      # Prepare the Kippo python modules for use
-     ln -s /usr/share/pyshared/kippo /usr/lib/python2.6/dist-packages/
-   
+     if [ ! -L /usr/lib/python2.6/dist-packages/kippo ]; then
+       ln -s /usr/share/pyshared/kippo /usr/lib/python2.6/dist-packages/
+     fi
+
      # Add a kippo user and group if they don't already exist.
      if ! getent passwd kippo >/dev/null ; then 
        adduser --quiet --system --no-create-home --group \
@@ -16,6 +18,7 @@ case "$1" in
      fi
 
      # Let's create the initial userdb.txt if it doesn't already exist
+     mkdir -p /var/lib/kippo/data
      if [ ! -f /var/lib/kippo/data/userdb.txt ]; then
        echo "root:0:123456" > /var/lib/kippo/data/userdb.txt
      fi
