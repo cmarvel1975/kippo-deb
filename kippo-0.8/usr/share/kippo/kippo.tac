@@ -18,7 +18,7 @@ if os.name == 'posix' and os.getuid() == 0:
     print 'ERROR: You must not run kippo as root!'
     sys.exit(1)
 
-if not os.path.exists('kippo.cfg'):
+if not os.path.exists('/etc/kippo/kippo.cfg'):
     print 'ERROR: kippo.cfg is missing!'
     sys.exit(1)
 
