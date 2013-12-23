@@ -1,0 +1,49 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+  "configure"|"reconfigure"|"upgrade")
+     # Prepare the Kippo python modules for use
+     if [ ! -L /usr/lib/python2.6/dist-packages/kippo ]; then
+       ln -s /usr/share/pyshared/kippo /usr/lib/python2.6/dist-packages/
+     fi
+
+     # Add a kippo user and group if they don't already exist.
+     if ! getent passwd kippo >/dev/null ; then 
+       adduser --quiet --system --no-create-home --group \
+         --home "/var/lib/kippo" \
+         --shell '/bin/false' \
+         --gecos 'Kippo user,,,' \
+         kippo
+     fi
+
+     # Let's create the initial userdb.txt if it doesn't already exist
+     mkdir -p /var/lib/kippo/data
+     if [ ! -f /var/lib/kippo/data/userdb.txt ]; then
+       echo "root:0:123456" > /var/lib/kippo/data/userdb.txt
+     fi
+
+     # Set some permissions on various directories
+     chown -R kippo:kippo /var/lib/kippo
+     chmod 750 /var/lib/kippo
+     chown -R kippo:kippo /var/log/kippo
+     chmod 750 /var/lib/kippo
+
+     # Register the init.d script with update-rc.d
+     update-rc.d kippo defaults >/dev/null
+
+;;
+
+  abort-upgrade|abort-remove|abort-deconfigure)
+
+  # Remove the link to the python modules
+  rm -f /usr/lib/python2.6/dist-packages/kippo
+;;
+
+  *)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
+;;
+esac
+
+exit 0

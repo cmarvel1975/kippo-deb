@@ -1,0 +1,41 @@
+#!/bin/sh
+set -e
+case "$1" in
+    purge)
+
+        # Remove Kippo data
+        rm -rf /var/lib/kippo
+	rm -rf /etc/kippo
+	rm -f /usr/lib/python2.6/dist-packages/kippo
+	rm -rf /var/run/kippo
+	rm -rf /var/log/kippo
+
+        # Ensure kippo has stopped. @TODO not sure this is really required,
+        # but had problems removing the user if Kippo was still running.
+	if pgrep -f kippo.tac >/dev/null 2>&1 ; then
+  	  pkill -9 -f kippo.tac
+        fi
+
+        # Delete the kippo user if we can
+        if which deluser >/dev/null 2>&1 ; then
+            deluser --quiet --system kippo > /dev/null || true
+        else
+            echo >&2 "not removing aegir system account because deluser command was not found"
+        fi
+
+	# De-register the init script from update-rc.d
+        update-rc.d kippo remove >/dev/null || exit $?
+    ;;
+    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+
+        # Remove the link to the python modules
+        rm -f /usr/lib/python2.6/dist-packages/kippo
+
+    ;;
+
+    *)
+        echo "postrm called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+exit 0
