@@ -4,8 +4,8 @@ set -e
 case "$1" in
   "configure"|"reconfigure"|"upgrade")
      # Prepare the Kippo python modules for use
-     if [ ! -L /usr/lib/python2.6/dist-packages/kippo ]; then
-       ln -s /usr/share/pyshared/kippo /usr/lib/python2.6/dist-packages/
+     if [ ! -L /usr/lib/python2.7/dist-packages/kippo ]; then
+       ln -s /usr/share/pyshared/kippo /usr/lib/python2.7/dist-packages/
      fi
 
      # Add a kippo user and group if they don't already exist.
@@ -37,7 +37,7 @@ case "$1" in
   abort-upgrade|abort-remove|abort-deconfigure)
 
   # Remove the link to the python modules
-  rm -f /usr/lib/python2.6/dist-packages/kippo
+  rm -f /usr/lib/python2.7/dist-packages/kippo
 ;;
 
   *)
